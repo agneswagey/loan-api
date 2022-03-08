@@ -1,0 +1,9 @@
+NEW DATA 
+Name : Agnes Wagey
+Date of birth : 09/03/85
+Ktp : 3201024903850017
+Loan amount : 3000
+Loan period : 6
+Loan purpose : vacation
+Gender : F
+===========================

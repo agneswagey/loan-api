@@ -1,0 +1,1 @@
+{"version":1,"defects":{"RegisterTest::testNameCount":3,"RegisterTest::testCheckLoanPurpose":3,"RegisterTest::testCheckKtp":4},"times":{"LoanAmountTest::testLoanAmount":0.032,"RegisterTest::testLoanAmount":0.035,"RegisterTest::testNameCount":0.002,"RegisterTest::testCheckLoanPurpose":0.001,"RegisterTest::testCheckKtp":0.004}}
