@@ -23,12 +23,18 @@ class LoanPurpose {
         return $output;
     }
 
-    // public function isValid($input, $purposes) {
-    //     $isValid = v::contains($input)->validate($purposes);
+    public function isValid($input, $purposes) {
+        $isValid = v::contains($input)->validate($purposes);
 
-    //     return $isValid;
+        return $isValid;
 
-    // }
+    }
+
+    public function getLoanPurpose() {
+        $purpose = array('vacation', 'renovation', 'electronics', 'wedding', 'rent', 'car', 'investment');
+
+        return $purpose;
+    }
 
 
 }
