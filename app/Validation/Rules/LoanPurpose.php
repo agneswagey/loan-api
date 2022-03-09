@@ -9,6 +9,11 @@ class LoanPurpose {
 
     public function validate($input) {
         $purposes = array('vacation', 'renovation', 'electronics', 'wedding', 'rent', 'car', 'investment');
+        return v::in($purposes)->setName("Loan Purpose");
+    }
+
+    public function validate__($input) {
+        $purposes = array('vacation', 'renovation', 'electronics', 'wedding', 'rent', 'car', 'investment');
         
         foreach($purposes as $p) {
             if(v::key($p)->validate($input)) {

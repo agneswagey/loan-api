@@ -16,14 +16,20 @@ use Respect\Validation\Exceptions\NestedValidationException as e;
 class RegisterController extends Controller {
     
     public function register($request, $response) {
+        $contents = json_decode(file_get_contents('php://input'), true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $request = $request->withParsedBody($contents);
+        }
+        $parsedBody = $request->getParsedBody();
+
         // Set rules for name
-        $name = trim($request->getParam('name'));
+        $name = trim($parsedBody['name']);
         $nameObj = new FirstLastName();
         $nameRules = $nameObj->validate($name, $response);
         $user_data['name'] = $nameRules[1];
 
         // Set rules for date of birth
-        $dateOfBirth = $request->getParam('date_of_birth');
+        $dateOfBirth = $parsedBody['date_of_birth'];
         $dobObj = new DateOfBirth();
         $dobRules = $dobObj->validate($dateOfBirth);
         if($dobRules) {
@@ -35,28 +41,28 @@ class RegisterController extends Controller {
         }
         
         // Set rules for gender
-        $gender = $request->getParam('gender');
+        $gender = $parsedBody['gender'];
         $genderObj = new Gender();
         $genderRules = $genderObj->validate($gender, $date, $month, $year);
         $dobNew = $genderRules[1];
         
         // Set rules for KTP
-        $ktp = $request->getParam('ktp');
+        $ktp = $parsedBody['ktp'];
         $ktpObj = new KTP();
         $ktpRules = $ktpObj->validate($ktp, $dobNew);
         
         // Set rules for Loan Amount
-        $loanAmount = $request->getParam('loan_amount');
+        $loanAmount = $parsedBody['loan_amount'];
         $loanAmountObj = new LoanAmount();
         $loanAmountRules = $loanAmountObj->validate($loanAmount);
         
         // Set rules for Loan period
-        $loanPeriod = $request->getParam('loan_period');
+        $loanPeriod = $parsedBody['loan_period'];
         $loanPeriodObj = new LoanPeriod();
         $loanPeriodRules = $loanPeriodObj->validate($loanPeriod);
 
         // Set rules for Loan Purpose
-        $loanPurpose = $request->getParam('loan_purpose');
+        $loanPurpose = $parsedBody['loan_purpose'];
         $loanPurposeObj = new LoanPurpose();
         $loanPurposeRules = $loanPurposeObj->validate($loanPurpose);
         
