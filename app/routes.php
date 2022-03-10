@@ -5,3 +5,4 @@ $app->get('/register', function() {
 });
 
 $app->post('/register', 'RegisterController:register')->setName('register');
+

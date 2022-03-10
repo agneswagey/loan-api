@@ -1,9 +1,9 @@
 NEW DATA 
 Name : Putri Ayu
-Date of birth : 01/01/98
+Date of birth : 
 Ktp : 3201024101980017
-Loan amount : 10000
-Loan period : 4
-Loan purpose : renovation
+Loan amount : 
+Loan period : 
+Loan purpose : 
 Gender : F
 ===========================

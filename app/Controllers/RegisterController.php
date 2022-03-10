@@ -12,26 +12,27 @@ use \App\Validation\Rules\LoanPeriod;
 use \App\Validation\Rules\LoanPurpose;
 use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\NestedValidationException as e;
+use Respect\Validation\Rules\AbstractRule;
 
 class RegisterController extends Controller {
     
     public function register($request, $response) {
-        $contents = json_decode(file_get_contents('php://input'), true);
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $request = $request->withParsedBody($contents);
-        }
         $parsedBody = $request->getParsedBody();
-
-        // Set rules for name
+        
         $name = trim($parsedBody['name']);
-        $nameObj = new FirstLastName();
-        $nameRules = $nameObj->validate($name, $response);
+        $dateOfBirth = $parsedBody['dateOfBirth'];
+        $gender = $parsedBody['gender'];
+        $ktp = $parsedBody['ktp'];
+        $loanAmount = $parsedBody['loanAmount'];
+        $loanPeriod = $parsedBody['loanPeriod'];
+        $loanPurpose = $parsedBody['loanPurpose'];
+        
+        // Set validation for name
+        $nameRules = $this->nameValidator($name);
         $user_data['name'] = $nameRules[1];
 
-        // Set rules for date of birth
-        $dateOfBirth = $parsedBody['date_of_birth'];
-        $dobObj = new DateOfBirth();
-        $dobRules = $dobObj->validate($dateOfBirth);
+        // Set validation for date of birth
+        $dobRules = $this->dateOfBirthValidator($dateOfBirth);
         if($dobRules) {
             $dobArr = explode("/", $dateOfBirth);
             $date = $dobArr[0];
@@ -40,31 +41,21 @@ class RegisterController extends Controller {
             $dob = $date . $month . $year;
         }
         
-        // Set rules for gender
-        $gender = $parsedBody['gender'];
-        $genderObj = new Gender();
-        $genderRules = $genderObj->validate($gender, $date, $month, $year);
+        // Set validation for gender
+        $genderRules = $this->genderValidator($gender, $date, $month, $year);
         $dobNew = $genderRules[1];
         
-        // Set rules for KTP
-        $ktp = $parsedBody['ktp'];
-        $ktpObj = new KTP();
-        $ktpRules = $ktpObj->validate($ktp, $dobNew);
+        // Set validation for KTP
+        $ktpRules = $this->ktpValidator($ktp, $dobNew);
         
-        // Set rules for Loan Amount
-        $loanAmount = $parsedBody['loan_amount'];
-        $loanAmountObj = new LoanAmount();
-        $loanAmountRules = $loanAmountObj->validate($loanAmount);
+        // Set validation for Loan Amount
+        $loanAmountRules = $this->loanAmountValidator($loanAmount);
         
-        // Set rules for Loan period
-        $loanPeriod = $parsedBody['loan_period'];
-        $loanPeriodObj = new LoanPeriod();
-        $loanPeriodRules = $loanPeriodObj->validate($loanPeriod);
+        // Set validation for Loan period
+        $loanPeriodRules = $this->loanPeriodValidator($loanPeriod);
 
-        // Set rules for Loan Purpose
-        $loanPurpose = $parsedBody['loan_purpose'];
-        $loanPurposeObj = new LoanPurpose();
-        $loanPurposeRules = $loanPurposeObj->validate($loanPurpose);
+        // Set validation for Loan Purpose
+        $loanPurposeRules = $this->loanPurposeValidator($loanPurpose);
         
 
         $rules = array(
@@ -100,7 +91,6 @@ class RegisterController extends Controller {
                 
             }
         }
-        
 
         // Write data on a file
         $text = 'NEW DATA ' . PHP_EOL;
@@ -114,5 +104,59 @@ class RegisterController extends Controller {
         fclose($file);
 
         return $response->withJson('Success. Registered data file has been created', 200);
+    }
+
+    private function nameValidator($input) {
+        $nameArr = count(explode(" ", $input));
+        $rules = v::notEmpty()->min(2)->setName('name');
+        $output = array($rules, $nameArr, $input);
+        
+        return $output;
+    }
+
+    private function dateOfBirthValidator($input) {
+        return v::notEmpty()->date('d/m/y')->setName('Date of birth');
+    }
+
+    private function genderValidator($input, $date, $month, $year) {
+        $rules = v::notEmpty();
+        if(v::notEmpty()->equals('F')->validate($input)) {
+            $dt = substr($date, 0, 1);
+            if($dt == "0") {
+                $dt1 = (int) str_replace("0", "", $date);
+            }
+            $dtNew = $dt1 + 40;
+            
+            $dobNew = $dtNew . $month . $year;
+
+        } else if(v::notEmpty()->equals('M')->validate($input)) { 
+            $dobNew = $date . $month . $year;
+        }    
+
+        $output = array($rules, $dobNew);
+        
+        return $output;
+    }
+
+    private function ktpValidator($input, $dobNew) {
+        $ktp1Str = substr($input, 0, 6);
+        $ktp2Str = substr($input, 12, 4);
+        $ktpFull = $ktp1Str . $dobNew . $ktp2Str;
+        
+        return v::notEmpty()->numericVal()->equals($ktpFull)->length(16,16)->setName('KTP');
+    }
+
+    private function loanAmountValidator($input) {
+        return v::notEmpty()->intVal()->between(1000, 10000)->setName('Loan amount');
+    }
+
+    private function loanPeriodValidator($input) {
+        return v::notEmpty()->numericVal()->setName('Loan period');
+    }
+
+    private function loanPurposeValidator($input) {
+        $purposes = array('vacation', 'renovation', 'electronics', 'wedding', 'rent', 'car', 'investment');
+
+        return v::in($purposes)->setName("Loan Purpose");
     }
 }
