@@ -10,6 +10,12 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = new \Slim\App([
     'settings' => [
         'displayErrorDetails'   => true,
+        'db' => [
+            'host' => 'localhost',
+            'dbname' => 'test',
+            'user' => 'root',
+            'pass' => ''
+        ],
     ]
 ]);
 
@@ -42,6 +48,23 @@ $container['AuthController'] = function ($container) {
 
 $container['RegisterController'] = function ($container) {
     return new \App\Controllers\RegisterController($container);
+};
+
+$container['BodyParser'] = function ($container) {
+    return new \Api\Models\BodyParser($container);
+};
+
+$container['Validation'] = function ($container) {
+    return new \Api\Models\Validation($container);
+};
+
+$container['db'] = function ($c){
+    $settings = $c->get('settings')['db'];
+    $server = "mysql:host=".$settings['host'].";dbname=".$settings['dbname'];
+    $conn = new PDO($server, $settings["user"], $settings["pass"]);  
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    return $conn;
 };
 
 // f::withRuleNamespace('App\\Validation\\Rules', true);

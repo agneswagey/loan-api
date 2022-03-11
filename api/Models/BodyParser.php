@@ -1,15 +1,10 @@
 <?php
 
-namespace App\Controllers;
+namespace Api\Models;
 
-use \Slim\Views\Twig as View;
-use Respect\Validation\Validator as v;
-use Respect\Validation\Exceptions\NestedValidationException as e;
-use Respect\Validation\Rules\AbstractRule;
+class BodyParser {
 
-class RegisterController extends Controller {
-    
-    public function register($request, $response) {
+    public function getInput($request, $response, $args) {
         $parsedBody = $request->getParsedBody();
         
         $name = trim($parsedBody['name']);
@@ -19,13 +14,15 @@ class RegisterController extends Controller {
         $loanAmount = $parsedBody['loanAmount'];
         $loanPeriod = $parsedBody['loanPeriod'];
         $loanPurpose = $parsedBody['loanPurpose'];
-        
+
+        $validator = new Validation();
+
         // Set validation for name
-        $nameRules = $this->nameValidator($name);
+        $nameRules = $validator->nameValidator($name);
         $user_data['name'] = $nameRules[1];
 
         // Set validation for date of birth
-        $dobRules = $this->dateOfBirthValidator($dateOfBirth);
+        $dobRules = $validator->dateOfBirthValidator($dateOfBirth);
         if($dobRules) {
             $dobArr = explode("/", $dateOfBirth);
             $date = $dobArr[0];
@@ -35,20 +32,20 @@ class RegisterController extends Controller {
         }
         
         // Set validation for gender
-        $genderRules = $this->genderValidator($gender, $date, $month, $year);
+        $genderRules = $validator->genderValidator($gender, $date, $month, $year);
         $dobNew = $genderRules[1];
         
         // Set validation for KTP
-        $ktpRules = $this->ktpValidator($ktp, $dobNew);
+        $ktpRules = $validator->ktpValidator($ktp, $dobNew);
         
         // Set validation for Loan Amount
-        $loanAmountRules = $this->loanAmountValidator($loanAmount);
+        $loanAmountRules = $validator->loanAmountValidator($loanAmount);
         
         // Set validation for Loan period
-        $loanPeriodRules = $this->loanPeriodValidator($loanPeriod);
+        $loanPeriodRules = $validator->loanPeriodValidator($loanPeriod);
 
         // Set validation for Loan Purpose
-        $loanPurposeRules = $this->loanPurposeValidator($loanPurpose);
+        $loanPurposeRules = $validator->loanPurposeValidator($loanPurpose);
         
 
         $rules = array(
@@ -97,59 +94,6 @@ class RegisterController extends Controller {
         fclose($file);
 
         return $response->withJson('Success. Registered data file has been created', 200);
-    }
+      }
 
-    private function nameValidator($input) {
-        $nameArr = count(explode(" ", $input));
-        $rules = v::notEmpty()->min(2)->setName('name');
-        $output = array($rules, $nameArr, $input);
-        
-        return $output;
-    }
-
-    private function dateOfBirthValidator($input) {
-        return v::notEmpty()->date('d/m/y')->setName('Date of birth');
-    }
-
-    private function genderValidator($input, $date, $month, $year) {
-        $rules = v::notEmpty();
-        if(v::notEmpty()->equals('F')->validate($input)) {
-            $dt = substr($date, 0, 1);
-            if($dt == "0") {
-                $dt1 = (int) str_replace("0", "", $date);
-            }
-            $dtNew = $dt1 + 40;
-            
-            $dobNew = $dtNew . $month . $year;
-
-        } else if(v::notEmpty()->equals('M')->validate($input)) { 
-            $dobNew = $date . $month . $year;
-        }    
-
-        $output = array($rules, $dobNew);
-        
-        return $output;
-    }
-
-    private function ktpValidator($input, $dobNew) {
-        $ktp1Str = substr($input, 0, 6);
-        $ktp2Str = substr($input, 12, 4);
-        $ktpFull = $ktp1Str . $dobNew . $ktp2Str;
-        
-        return v::notEmpty()->numericVal()->equals($ktpFull)->length(16,16)->setName('KTP');
-    }
-
-    private function loanAmountValidator($input) {
-        return v::notEmpty()->intVal()->between(1000, 10000)->setName('Loan amount');
-    }
-
-    private function loanPeriodValidator($input) {
-        return v::notEmpty()->numericVal()->setName('Loan period');
-    }
-
-    private function loanPurposeValidator($input) {
-        $purposes = array('vacation', 'renovation', 'electronics', 'wedding', 'rent', 'car', 'investment');
-
-        return v::in($purposes)->setName("Loan Purpose");
-    }
 }
