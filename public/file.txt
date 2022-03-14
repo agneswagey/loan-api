@@ -1,9 +1,0 @@
-NEW DATA 
-Name : Putri Sandra
-Date of birth : 
-Ktp : 3201024101980017
-Loan amount : 
-Loan period : 
-Loan purpose : 
-Gender : F
-===========================

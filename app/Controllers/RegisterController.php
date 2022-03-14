@@ -7,11 +7,12 @@ use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\NestedValidationException as e;
 use Respect\Validation\Rules\AbstractRule;
 use Api\Models\Customer;
-use Api\Provider\CustomerData;
+use App\Provider\CustomerData;
 
 class RegisterController extends Controller {
     
     public function register($request, $response) {
+
         $parsedBody = $request->getParsedBody();
         
         $name = trim($parsedBody['name']);
@@ -31,41 +32,26 @@ class RegisterController extends Controller {
         $customer->setLoanPeriod($loanPeriod);
         $customer->setLoanPurpose($loanPurpose);
         
-        $rules = $customer->customerValidator();
-        
-        $data = array(
-            'name'  => $name,
-            'dateOfBirth'  => $dateOfBirth,
-            'ktp'  => $ktp,
-            'loanAmount'  => $loanAmount,
-            'loanPeriod'  => $loanPeriod,
-            'loanPurpose'  => $loanPurpose,
-            'gender'  => $gender,
-        );
+        try
+        {
+            $customer->customerValidator()->assert($customer);
+        }
+        catch(NestedValidationException $exception) {
 
-        
-        foreach($data as $key => $val) {
-            try{
-                $rules->check($val);
-            } catch(\InvalidArgumentException $e) {
-                $errors = $e->getMessage();
-                
-                return $response->withJson($errors, 401);
-                
+            foreach ($exception->getIterator() as $exception2)
+            {
+                $errors[] = $exception2->getMessage();
             }
         }
-        // Write data on database
-        // $cust = new CustomerData();
-        // $cust->saveData();
 
-        // $sql = "SELECT * FROM customer WHERE customerId = 2";
-        // $stmt = $this->db->query($sql);
-        // // $stmt = $this->db->prepare($sql);
-        // // $stmt->execute();
-        // // $result = $stmt->fetchAll();
-        // return $response->withJson(["status" => "success", "data" => $result], 200);
+        // Write data on database
+        $cust = new CustomerData($this->db);
+        $message = $cust->saveData($customer);
+        
+        return $response->withJson(["status" => "success", "data" => $message], 200);
 
         
+
     }
 
     
