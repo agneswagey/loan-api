@@ -82,18 +82,25 @@ class BodyParser {
             }
         }
 
+        // Write data on database
+        $sql = "SELECT * FROM customer";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        return $response->withJson(["status" => "success", "data" => $result], 200);
+
         // Write data on a file
-        $text = 'NEW DATA ' . PHP_EOL;
-        foreach($user_data as $k => $v) {
-            $text .= ucfirst(str_replace("_", " ", $k)) . ' : ' . $request->getParam($k) . PHP_EOL ;
-        } 
-        $text .= '===========================' . PHP_EOL;
+        // $text = 'NEW DATA ' . PHP_EOL;
+        // foreach($user_data as $k => $v) {
+        //     $text .= ucfirst(str_replace("_", " ", $k)) . ' : ' . $request->getParam($k) . PHP_EOL ;
+        // } 
+        // $text .= '===========================' . PHP_EOL;
 
-        $file = fopen("file.txt","w");
-        fwrite($file, $text);
-        fclose($file);
+        // $file = fopen("file.txt","w");
+        // fwrite($file, $text);
+        // fclose($file);
 
-        return $response->withJson('Success. Registered data file has been created', 200);
+        // return $response->withJson('Success. Registered data file has been created', 200);
       }
 
 }
