@@ -15,7 +15,7 @@ class Customer {
     public $loanAmount;
     public $loanPeriod;
     public $loanPurpose;
-    private $nameWords = 1;
+    public $nameWords;
 
     public function setName($input) {
 
@@ -104,14 +104,14 @@ class Customer {
     public function customerValidator() {
 
         $nameArr = explode(' ', $this->name);
-        // $this->nameWords = count($nameArr);
+        $this->nameWords = count($nameArr);
         $genders = array('M', 'F');
         $purposes = array('vacation', 'renovation', 'electronics', 'wedding', 'rent', 'car', 'investment');
 
         $dobNew = $this->getDobNew($this->gender, $this->dateOfBirth);
         $ktpNew = $this->getKtpNew($this->ktp, $dobNew);
 
-        return v::attribute('name', v::notEmpty()->length(2, null)->setName('Name'))
+        return v::attribute('nameWords', v::notEmpty()->min(2)->setName('Name'))
             ->attribute('dateOfBirth', v::notEmpty()->date('Y-m-d')->setName('Date of birth'))
             ->attribute('gender', v::notEmpty()->in($genders)->setName('Gender'))
             ->attribute('ktp', v::notEmpty()->numericVal()->equals($ktpNew)->length(16,16)->setName('KTP'))
@@ -122,6 +122,7 @@ class Customer {
     }
 
     public function getDobNew($input, $dateOfBirth) {
+
         $dateArr = explode('-', $dateOfBirth);
         if($input == 'F') {
             $dt = substr($dateArr[2], 0, 1);
@@ -137,6 +138,7 @@ class Customer {
         }    
 
         return $dobNew;
+        
     }
 
     public function getKtpNew($input, $dobNew) {

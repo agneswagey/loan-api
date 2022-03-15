@@ -37,11 +37,16 @@ class RegisterController extends Controller {
             $customer->customerValidator()->assert($customer);
         }
         catch(NestedValidationException $exception) {
+            
+            $message = $exception->getFullMessage();
 
-            foreach ($exception->getIterator() as $exception2)
-            {
-                $errors[] = $exception2->getMessage();
-            }
+            return $response->withJson(["status" => "success", "data" => $message], 200);
+
+            // foreach ($exception->getIterator() as $exception2)
+            // {
+            //     $errors[] = $exception2->getMessage();
+            // }
+            
         }
 
         // Write data on database
