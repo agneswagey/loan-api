@@ -2,20 +2,18 @@
 
 namespace App\Controllers;
 
-use \Slim\Views\Twig as View;
-use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\NestedValidationException as e;
-use Respect\Validation\Rules\AbstractRule;
 use Api\Models\Customer;
 use App\Provider\CustomerData;
 
 class RegisterController extends Controller {
-    
+
     public function register($request, $response) {
 
         $parsedBody = $request->getParsedBody();
         
-        $name = trim($parsedBody['name']);
+        $firstName = trim($parsedBody['firstName']);
+        $lastName = trim($parsedBody['lastName']);
         $dateOfBirth = $parsedBody['dateOfBirth'];
         $gender = $parsedBody['gender'];
         $ktp = $parsedBody['ktp'];
@@ -24,7 +22,8 @@ class RegisterController extends Controller {
         $loanPurpose = $parsedBody['loanPurpose'];
 
         $customer = new Customer();
-        $customer->setName($name);
+        $customer->setFirstName($firstName);
+        $customer->setLastName($lastName);
         $customer->setDateOfBirth($dateOfBirth);
         $customer->setGender($gender);
         $customer->setKtp($ktp);
@@ -32,28 +31,32 @@ class RegisterController extends Controller {
         $customer->setLoanPeriod($loanPeriod);
         $customer->setLoanPurpose($loanPurpose);
         
-        try
-        {
+        $errors = false;
+
+        try {
             $customer->customerValidator()->assert($customer);
         }
-        catch(NestedValidationException $exception) {
-            
-            $message = $exception->getFullMessage();
+        catch (e $exception){
 
-            return $response->withJson(["status" => "success", "data" => $message], 200);
+            foreach ($exception->getIterator() as $exception2) {
+                $errors[] = $exception2->getMessage();
+            }
 
-            // foreach ($exception->getIterator() as $exception2)
-            // {
-            //     $errors[] = $exception2->getMessage();
-            // }
-            
         }
 
-        // Write data on database
-        $cust = new CustomerData($this->db);
-        $message = $cust->saveData($customer);
+        if ($errors) {
+            return $response->withJson(["error" => implode(', ', $errors)], 400);
+        }
+        else {
+            // Write data on database
+            $cust = new CustomerData($this->db);
+            $message = $cust->saveData($customer);
+            
+            return $response->withJson(["status" => "success", "data" => $message], 200);
+        }
         
-        return $response->withJson(["status" => "success", "data" => $message], 200);
+
+        
 
         
 

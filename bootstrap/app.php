@@ -38,24 +38,8 @@ $container['validator'] = function ($container) {
     return new \App\Validation\Validator($container);
 };
 
-$container['UserController'] = function ($container) {
-    return new \App\Controllers\UserController($container);
-};
-
-$container['AuthController'] = function ($container) {
-    return new \App\Controllers\Auth\AuthController($container);
-};
-
 $container['RegisterController'] = function ($container) {
     return new \App\Controllers\RegisterController($container);
-};
-
-$container['BodyParser'] = function ($container) {
-    return new \Api\Models\BodyParser($container);
-};
-
-$container['Validation'] = function ($container) {
-    return new \Api\Models\Validation($container);
 };
 
 $container['db'] = function ($c){

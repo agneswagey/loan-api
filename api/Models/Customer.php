@@ -8,24 +8,36 @@ use Respect\Validation\Rules\AbstractRule;
 
 class Customer {
 
-    public $name;
+    public $firstName;
+    public $lastName;
     public $dateOfBirth;
     public $gender;
     public $ktp;
     public $loanAmount;
     public $loanPeriod;
     public $loanPurpose;
-    public $nameWords;
 
-    public function setName($input) {
+    public function setFirstName($input) {
 
-        $this->name = $input;
+        $this->firstName = $input;
 
     }
 
-    public function getName() {
+    public function getFirstName() {
         
-        return $this->name;
+        return $this->firstName;
+
+    }
+
+    public function setLastName($input) {
+
+        $this->lastName = $input;
+
+    }
+
+    public function getLastName() {
+        
+        return $this->lastName;
 
     }
 
@@ -103,15 +115,14 @@ class Customer {
 
     public function customerValidator() {
 
-        $nameArr = explode(' ', $this->name);
-        $this->nameWords = count($nameArr);
-        $genders = array('M', 'F');
-        $purposes = array('vacation', 'renovation', 'electronics', 'wedding', 'rent', 'car', 'investment');
+        $genders = ['M', 'F'];
+        $purposes = ['vacation', 'renovation', 'electronics', 'wedding', 'rent', 'car', 'investment'];
 
         $dobNew = $this->getDobNew($this->gender, $this->dateOfBirth);
         $ktpNew = $this->getKtpNew($this->ktp, $dobNew);
 
-        return v::attribute('nameWords', v::notEmpty()->min(2)->setName('Name'))
+        return v::attribute('firstName', v::notEmpty()->stringType()->setName('First Name'))
+            ->attribute('lastName', v::notEmpty()->stringType()->setName('Last Name'))
             ->attribute('dateOfBirth', v::notEmpty()->date('Y-m-d')->setName('Date of birth'))
             ->attribute('gender', v::notEmpty()->in($genders)->setName('Gender'))
             ->attribute('ktp', v::notEmpty()->numericVal()->equals($ktpNew)->length(16,16)->setName('KTP'))
@@ -138,7 +149,7 @@ class Customer {
         }    
 
         return $dobNew;
-        
+
     }
 
     public function getKtpNew($input, $dobNew) {

@@ -1,32 +1,26 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use \App\Validation\Rules\LoanAmount;
-use \App\Validation\Rules\FirstLastName;
-use \App\Validation\Rules\LoanPurpose;
-use \App\Validation\Rules\KTP;
 
 class RegisterTest extends TestCase {
     
-    public function testLoanAmount() {
-        $loan = new LoanAmount();
-        $isValid = $loan->isValid(1200);
+    public function testRegisterSuccess() {
 
-        $this->assertEquals(true, $isValid); 
+        $requestJson = ["firstName" => "Jevon", "lastName"  => "Tahapary", "dateOfBirth" => "2001-12-28", "gender" => "M", "ktp" => 3201022812010017, "loanAmount" => 2500, "loanPurpose" => "vacation", "loanPeriod" => 1];
+
+        $expectedJson = ["firstName" => "Jevon", "lastName"  => "Tahapary", "dateOfBirth" => "2001-12-28", "gender" => "M", "ktp" => 3201022812010017, "loanAmount" => 2500, "loanPurpose" => "vacation", "loanPeriod" => 1];
+
+        $this->assertJsonStringEqualsJsonString(json_encode($expectedJson), json_encode($requestJson));
+
     }
 
-    public function testNameCount() {
-        $name = new FirstLastName();
-        $count = $name->countNameWords('Putri Ayu');
+    public function testRegisterFailed() {
 
-        $this->assertGreaterThanOrEqual(2, $count);
-    }
+        $requestJson = ["firstName" => "Jevon", "lastName"  => "Tahapary", "dateOfBirth" => "2001-12-29", "gender" => "M", "ktp" => 3201022812010017, "loanAmount" => 2500, "loanPurpose" => "vacation", "loanPeriod" => 1];
 
-    public function testCheckLoanPurpose() {
-        $purpose = new LoanPurpose();
-        $loanPurpose = $purpose->getLoanPurpose();
+        $expectedJson = ["firstName" => "Jevon", "lastName"  => "Tahapary", "dateOfBirth" => "2001-12-29", "gender" => "M", "ktp" => 3201022912010017, "loanAmount" => 2500, "loanPurpose" => "vacation", "loanPeriod" => 1];
 
-        $this->assertContains('renovation', $loanPurpose);
+        $this->assertJsonStringEqualsJsonString(json_encode($expectedJson), json_encode($requestJson));
 
     }
 

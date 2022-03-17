@@ -16,28 +16,42 @@ class CustomerData {
 
     public function saveData($customer) {
 
-        $sql = "SELECT * FROM customer WHERE customerKtp = '" . $customer->ktp . "'";
-        $result = $this->con->query($sql);
+        $sql = "SELECT * FROM customer WHERE customerKtp = :ktp";
+        $result = $this->con->prepare($sql);
+        $result->bindParam('ktp', $customer->ktp);
+        $result->execute();
         $numRows = $result->rowCount();
         
         if(empty($numRows)) {
 
-            $sql = "INSERT INTO customer(customerName,
+            $sql = "INSERT INTO customer(customerFirstName,
+                                        customerLastName,
                                         customerDob,
                                         customerGender,
                                         customerKtp,
                                         customerLoanAmount,
                                         customerLoanPeriod,
                                         customerLoanPurpose)
-                            VALUES ('".$customer->name."', 
-                                    '".$customer->dateOfBirth."', 
-                                    '".$customer->gender."',
-                                    '".$customer->ktp."',
-                                    '".$customer->loanAmount."',
-                                    '".$customer->loanPeriod."',
-                                    '".$customer->loanPurpose."')";
+                            VALUES (:firstName,
+                                    :lastName, 
+                                    :dateOfBirth, 
+                                    :gender,
+                                    :ktp,
+                                    :loanAmount,
+                                    :loanPeriod,
+                                    :loanPurpose)";
             
-            $result = $this->con->query($sql);
+            $result = $this->con->prepare($sql);
+            $result->bindParam('firstName', $customer->firstName);
+            $result->bindParam('lastName', $customer->lastName);
+            $result->bindParam('dateOfBirth', $customer->dateOfBirth);
+            $result->bindParam('gender', $customer->gender);
+            $result->bindParam('ktp', $customer->ktp);
+            $result->bindParam('loanAmount', $customer->loanAmount);
+            $result->bindParam('loanPeriod', $customer->loanPeriod);
+            $result->bindParam('loanPurpose', $customer->loanPurpose);
+            $result->execute();
+            
             $message = "Data has been saved successfully";
 
         } else {
