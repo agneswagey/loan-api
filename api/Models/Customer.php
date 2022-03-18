@@ -162,4 +162,17 @@ class Customer {
 
     }
 
+    public function setDataCustomer($request) {
+
+        $this->setFirstName($request['firstName']);
+        $this->setLastName($request['lastName']);
+        $this->setDateOfBirth($request['dateOfBirth']);
+        $this->setGender($request['gender']);
+        $this->setKtp($request['ktp']);
+        $this->setLoanAmount($request['loanAmount']);
+        $this->setLoanPeriod($request['loanPeriod']);
+        $this->setLoanPurpose($request['loanPurpose']);
+
+    }
+
 }

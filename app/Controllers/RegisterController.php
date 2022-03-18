@@ -8,18 +8,20 @@ use App\Provider\CustomerData;
 
 class RegisterController extends Controller {
 
+    public $parsedBody;
+
     public function register($request, $response) {
 
-        $parsedBody = $request->getParsedBody();
+        $this->parsedBody = $request->getParsedBody();
         
-        $firstName = trim($parsedBody['firstName']);
-        $lastName = trim($parsedBody['lastName']);
-        $dateOfBirth = $parsedBody['dateOfBirth'];
-        $gender = $parsedBody['gender'];
-        $ktp = $parsedBody['ktp'];
-        $loanAmount = $parsedBody['loanAmount'];
-        $loanPeriod = $parsedBody['loanPeriod'];
-        $loanPurpose = $parsedBody['loanPurpose'];
+        $firstName = trim($this->parsedBody['firstName']);
+        $lastName = trim($this->parsedBody['lastName']);
+        $dateOfBirth = $this->parsedBody['dateOfBirth'];
+        $gender = $this->parsedBody['gender'];
+        $ktp = $this->parsedBody['ktp'];
+        $loanAmount = $this->parsedBody['loanAmount'];
+        $loanPeriod = $this->parsedBody['loanPeriod'];
+        $loanPurpose = $this->parsedBody['loanPurpose'];
 
         $customer = new Customer();
         $customer->setFirstName($firstName);
@@ -56,9 +58,11 @@ class RegisterController extends Controller {
         }
         
 
-        
+    }
 
-        
+    public function getParsedBody() {
+
+        return $this->parsedBody;
 
     }
 

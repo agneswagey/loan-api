@@ -32,6 +32,7 @@ class ComposerStaticInit2934b11055cffa49cdc0f05036594658
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Ctype\\' => 23,
+            'Src\\' => 4,
             'Slim\\Views\\' => 11,
             'Slim\\' => 5,
         ),
@@ -85,6 +86,10 @@ class ComposerStaticInit2934b11055cffa49cdc0f05036594658
         'Symfony\\Polyfill\\Ctype\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
+        ),
+        'Src\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src',
         ),
         'Slim\\Views\\' => 
         array (
