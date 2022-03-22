@@ -1,6 +1,8 @@
 <?php
 
-namespace Api\Models;
+declare(strict_types=1);
+
+namespace App\Models;
 
 use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\NestedValidationException as e;
@@ -8,108 +10,69 @@ use Respect\Validation\Rules\AbstractRule;
 
 class Customer {
 
-    public $firstName;
-    public $lastName;
-    public $dateOfBirth;
-    public $gender;
-    public $ktp;
-    public $loanAmount;
-    public $loanPeriod;
-    public $loanPurpose;
+    private $firstName;
+    private $lastName;
+    private $dateOfBirth;
+    private $gender;
+    private $ktp;
 
-    public function setFirstName($input) {
-
-        $this->firstName = $input;
+    public function setFirstName(string $firstName): void {
+        
+        $this->firstName = $firstName;
 
     }
 
-    public function getFirstName() {
+    public function getFirstName(): string {
         
         return $this->firstName;
 
     }
 
-    public function setLastName($input) {
+    public function setLastName(string $lastName): void {
 
-        $this->lastName = $input;
+        $this->lastName = $lastName;
 
     }
 
-    public function getLastName() {
+    public function getLastName(): string {
         
         return $this->lastName;
 
     }
 
-    public function setDateOfBirth($input) {
+    public function setDateOfBirth(string $dateOfBirth): void {
         
-        $this->dateOfBirth = $input;
+        $this->dateOfBirth = $dateOfBirth;
 
     }
 
-    public function getDateOfBirth() {
+    public function getDateOfBirth(): string {
         
         return $this->dateOfBirth;
 
     }
 
-    public function setGender($input) {
+    public function setGender(string $gender): void {
         
-        $this->gender = $input;
+        $this->gender = $gender;
 
     }
 
-    public function getGender() {
+    public function getGender(): string {
         
         return $this->gender;
 
     }
 
-    public function setKtp($input) {
+    public function setKtp(string $ktp): void {
         
-        $this->ktp = $input;
+        $this->ktp = $ktp;
 
     }
 
-    public function getKtp() {
+    public function getKtp(): string {
         
         return $this->ktp;
-
-    }
-
-    public function setLoanAmount($input) {
-        
-        $this->loanAmount = $input;
-
-    }
-
-    public function getLoanAmount() {
-        
-        return $this->loanAmount;
-
-    }
-
-    public function setLoanPeriod($input) {
-        
-        $this->loanPeriod = $input;
-
-    }
-
-    public function getLoanPeriod() {
-        
-        return $this->loanPeriod;
-
-    }
-
-    public function setLoanPurpose($input) {
-        
-        $this->loanPurpose = $input;
-
-    }
-
-    public function getLoanPurpose() {
-        
-        return $this->loanPurpose;
 
     }
 
@@ -125,10 +88,7 @@ class Customer {
             ->attribute('lastName', v::notEmpty()->stringType()->setName('Last Name'))
             ->attribute('dateOfBirth', v::notEmpty()->date('Y-m-d')->setName('Date of birth'))
             ->attribute('gender', v::notEmpty()->in($genders)->setName('Gender'))
-            ->attribute('ktp', v::notEmpty()->numericVal()->equals($ktpNew)->length(16,16)->setName('KTP'))
-            ->attribute('loanAmount', v::notEmpty()->intVal()->between(1000, 10000)->setName('Loan amount'))
-            ->attribute('loanPeriod', v::notEmpty()->numericVal()->setName('Loan period'))
-            ->attribute('loanPurpose', v::notEmpty()->in($purposes)->setName("Loan Purpose"));
+            ->attribute('ktp', v::notEmpty()->intVal()->equals($ktpNew)->length(16,16)->setName('KTP'));
 
     }
 
@@ -164,14 +124,11 @@ class Customer {
 
     public function setDataCustomer($request) {
 
-        $this->setFirstName($request['firstName']);
+        $this->setFirstName($request['firstName']); 
         $this->setLastName($request['lastName']);
         $this->setDateOfBirth($request['dateOfBirth']);
         $this->setGender($request['gender']);
         $this->setKtp($request['ktp']);
-        $this->setLoanAmount($request['loanAmount']);
-        $this->setLoanPeriod($request['loanPeriod']);
-        $this->setLoanPurpose($request['loanPurpose']);
 
     }
 

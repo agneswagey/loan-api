@@ -3,40 +3,29 @@
 namespace App\Controllers;
 
 use Respect\Validation\Exceptions\NestedValidationException as e;
-use Api\Models\Customer;
-use App\Provider\CustomerData;
+use App\Models\Customer;
+use App\Models\Loan;
+use App\Providers\CustomerProvider;
 
 class RegisterController extends Controller {
 
-    public $parsedBody;
+    private $parsedBody;
 
     public function register($request, $response) {
 
         $this->parsedBody = $request->getParsedBody();
         
-        $firstName = trim($this->parsedBody['firstName']);
-        $lastName = trim($this->parsedBody['lastName']);
-        $dateOfBirth = $this->parsedBody['dateOfBirth'];
-        $gender = $this->parsedBody['gender'];
-        $ktp = $this->parsedBody['ktp'];
-        $loanAmount = $this->parsedBody['loanAmount'];
-        $loanPeriod = $this->parsedBody['loanPeriod'];
-        $loanPurpose = $this->parsedBody['loanPurpose'];
-
         $customer = new Customer();
-        $customer->setFirstName($firstName);
-        $customer->setLastName($lastName);
-        $customer->setDateOfBirth($dateOfBirth);
-        $customer->setGender($gender);
-        $customer->setKtp($ktp);
-        $customer->setLoanAmount($loanAmount);
-        $customer->setLoanPeriod($loanPeriod);
-        $customer->setLoanPurpose($loanPurpose);
-        
+        $customer->setDataCustomer($this->parsedBody);
+
+        $loan = new Loan();
+        $loan->setDataLoan($this->parsedBody);
+                
         $errors = false;
 
         try {
             $customer->customerValidator()->assert($customer);
+            $loan->loanValidator()->assert($loan);
         }
         catch (e $exception){
 
@@ -50,9 +39,9 @@ class RegisterController extends Controller {
             return $response->withJson(["error" => implode(', ', $errors)], 400);
         }
         else {
-            // Write data on database
-            $cust = new CustomerData($this->db);
-            $message = $cust->saveData($customer);
+            // Insert data into database
+            $cust = new CustomerProvider($this->db);
+            $message = $cust->saveData($customer, $loan);
             
             return $response->withJson(["status" => "success", "data" => $message], 200);
         }
@@ -60,11 +49,4 @@ class RegisterController extends Controller {
 
     }
 
-    public function getParsedBody() {
-
-        return $this->parsedBody;
-
-    }
-
-    
 }
